@@ -50,9 +50,6 @@ claude-team --mode tmux
 claude-team --mode in-process
 claude-team --mode auto
 
-# Disable --continue (starts fresh session instead of continuing)
-claude-team --no-continue
-
 # Pass extra args to claude
 claude-team --mode tmux -- --resume
 
@@ -83,7 +80,6 @@ Once in a team session:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CLAUDE_TEAM_DEFAULT_MODE` | `auto` | Default mode for `--no-interactive` |
-| `CLAUDE_TEAM_CONTINUE` | `1` | Set to `0` to disable `--continue` (fresh session each launch) |
 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | set to `1` | Enables agent teams (set automatically) |
 
 ## Relationship to claude-utils
