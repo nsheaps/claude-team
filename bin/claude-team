@@ -48,6 +48,10 @@ KEYBOARD CONTROLS (once in a team session):
   Ctrl+T           Toggle task list
   Shift+Tab        Toggle delegate mode (lead coordination only)
 
+  TIP: If a teammate is unresponsive (stuck mid-turn), send ESC via tmux
+  to interrupt its turn and allow pending messages to propagate:
+    tmux send-keys -t <pane-id> Escape
+
 EXAMPLES:
   claude-team                          # Interactive mode picker
   claude-team --mode tmux              # Tmux split panes

@@ -102,6 +102,8 @@ Once in a team session:
 | Ctrl+O | Toggle verbose transcript |
 | Shift+Tab | Toggle delegate mode (lead coordination only) |
 
+> **Tip:** When a teammate agent is unresponsive (stuck mid-turn and not processing messages), send the ESC key via tmux to interrupt its current turn and allow pending messages to propagate. Example: `tmux send-keys -t <pane-id> Escape`
+
 ## Dependencies
 
 - [Claude Code](https://code.claude.com/) (`claude` CLI) -- required
