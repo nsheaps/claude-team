@@ -7,13 +7,16 @@ Launch and manage Claude Code agent team sessions.
 `claude-team` is a CLI tool that wraps Claude Code with the experimental agent teams feature enabled. It handles:
 
 - Interactive teammate display mode selection (auto, in-process, tmux)
-- Automatic tmux session management (including iTerm2 control mode)
-- Orchestrator system prompt injection
-- Session lifecycle hooks
+- Automatic tmux session management (including iTerm2 `tmux -CC` control mode)
+- Orchestrator system prompt injection for lead coordination
+- Session lifecycle hooks (start/stop notifications)
+- Automatic dependency installation via Homebrew (gum, tmux)
 
 ## Installation
 
-### Homebrew (recommended)
+### Homebrew
+
+> **Note**: Homebrew formula is not yet published. Use manual installation for now.
 
 ```bash
 brew tap nsheaps/devsetup
@@ -39,48 +42,103 @@ source ~/.zshrc
 ## Usage
 
 ```bash
-# Interactive mode picker
+# Interactive mode picker (prompts via gum)
 claude-team
 
-# Shorthand
+# Shorthand alias
 ct
 
-# Specify mode directly
-claude-team --mode tmux
+# Specify mode directly (skips interactive prompt)
+claude-team -m tmux
 claude-team --mode in-process
 claude-team --mode auto
 
-# Pass extra args to claude
+# Pass extra args to claude after --
 claude-team --mode tmux -- --resume
 
-# Non-interactive (for scripts)
+# Non-interactive mode (uses CLAUDE_TEAM_DEFAULT_MODE or "auto")
 claude-team --no-interactive
+
+# Show help
+claude-team --help
 ```
+
+### Teammate Display Modes
+
+| Mode | Description |
+|:-----|:------------|
+| `auto` | Auto-detect best backend (default) |
+| `in-process` | Hidden sessions within the same process, navigate with Shift+Up/Down |
+| `tmux` | Visible split panes; auto-launches `tmux -CC` if not already in a tmux session |
+
+### What the Script Does
+
+When launched, `claude-team`:
+
+1. Prompts for teammate mode (or uses `--mode`/`--no-interactive`)
+2. Auto-installs missing dependencies (gum, tmux) via Homebrew
+3. If tmux mode is selected and you're not in a tmux session, auto-launches `tmux -CC` (iTerm2 control mode)
+4. Launches `claude` with:
+   - `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+   - `--teammate-mode <selected>`
+   - `--permission-mode delegate`
+   - `--continue` (resumes previous session)
+   - `--dangerously-skip-permissions`
+   - An orchestrator system prompt
+   - Session start/stop lifecycle hooks
+
+> **Security note**: The script uses `--dangerously-skip-permissions` by default, which allows Claude to execute any tool without confirmation. This is intended for orchestrator sessions where the lead needs uninterrupted coordination.
 
 ## Keyboard Controls
 
 Once in a team session:
 
 | Key | Action |
-|-----|--------|
-| Shift+Up/Down | Cycle through teammates |
+|:----|:-------|
+| Shift+Up/Down | Cycle through teammates (in-process mode) |
 | Enter | View selected teammate |
 | Escape | Interrupt teammate's turn |
 | Ctrl+T | Toggle task list |
-| Shift+Tab | Toggle delegate mode |
+| Ctrl+O | Toggle verbose transcript |
+| Shift+Tab | Toggle delegate mode (lead coordination only) |
 
 ## Dependencies
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`claude` CLI)
-- [gum](https://github.com/charmbracelet/gum) (interactive mode picker)
-- [tmux](https://github.com/tmux/tmux) (optional, for tmux teammate mode)
+- [Claude Code](https://code.claude.com/) (`claude` CLI) -- required
+- [gum](https://github.com/charmbracelet/gum) -- interactive mode picker (auto-installed via Homebrew if missing)
+- [tmux](https://github.com/tmux/tmux) -- required for tmux mode (auto-installed via Homebrew if missing)
+- [Homebrew](https://brew.sh/) -- used for auto-installing gum and tmux
 
 ## Environment Variables
 
 | Variable | Default | Description |
-|----------|---------|-------------|
-| `CLAUDE_TEAM_DEFAULT_MODE` | `auto` | Default mode for `--no-interactive` |
-| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | set to `1` | Enables agent teams (set automatically) |
+|:---------|:--------|:------------|
+| `CLAUDE_TEAM_DEFAULT_MODE` | `auto` | Default teammate mode when using `--no-interactive` |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | set to `1` | Enables agent teams (set automatically by the script) |
+
+## Development
+
+```bash
+# Lint shell scripts (syntax check)
+mise run lint
+
+# Format markdown with prettier
+mise run fmt
+
+# Check markdown formatting
+mise run fmt-check
+```
+
+## Project Structure
+
+```
+bin/
+  claude-team      # Main launcher script
+  ct               # Shorthand alias (delegates to claude-team)
+  lib/
+    stdlib.sh      # Shared utilities (colors, logging, check_and_install)
+mise.toml          # Task runner config (lint, fmt, test)
+```
 
 ## Relationship to claude-utils
 
