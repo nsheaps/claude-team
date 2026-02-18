@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Node (if we add package.json later)
+node_modules/
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Claude Code working files
+.claude/tmp/

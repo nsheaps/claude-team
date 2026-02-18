@@ -1,0 +1,27 @@
+[tasks.lint]
+description = "Check shell scripts for syntax errors"
+run = """
+for script in bin/*; do
+  [ -d "$script" ] && continue
+  echo "Checking $script..."
+  bash -n "$script"
+done
+for lib in bin/lib/*.sh; do
+  [ -f "$lib" ] || continue
+  echo "Checking $lib..."
+  bash -n "$lib"
+done
+echo "All scripts passed syntax check."
+"""
+
+[tasks.test]
+description = "Run tests"
+run = "echo 'No tests configured yet'"
+
+[tasks.fmt]
+description = "Format markdown files with prettier (requires npx)"
+run = "npx prettier --write '**/*.md'"
+
+[tasks.fmt-check]
+description = "Check markdown formatting"
+run = "npx prettier --check '**/*.md'"
